@@ -28,8 +28,24 @@ use Milpa\Command\Operation;
  */
 class WebSearchOperations implements CommandProvider
 {
-    public function __construct(private readonly ?Searx $searx = null)
+    private ?Searx $searx = null;
+
+    /**
+     * The endpoint this provider talks to — the seam a test uses instead of the network.
+     *
+     * It is a NAMED constructor and not a constructor argument for a measured reason: the host
+     * instantiates a declared provider with the app container whenever the constructor takes any
+     * parameter at all (`app-runtime`'s Application: `newInstance($container)` if
+     * `getNumberOfParameters() > 0`). So that slot belongs to the host, and a typed collaborator
+     * sitting in it makes every real app fail with a TypeError while every unit test passes. Found
+     * on cattle, greenhouse evidence/0529.
+     */
+    public static function withEndpoint(Searx $searx): self
     {
+        $provider = new self();
+        $provider->searx = $searx;
+
+        return $provider;
     }
 
     /**

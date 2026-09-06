@@ -118,7 +118,7 @@ final class WebSearchOperationsTest extends TestCase
 
     public function testAnEmptyQueryReachesNobody(): void
     {
-        $op = (new WebSearchOperations(new FakeSearx('never')))->operations()[0];
+        $op = WebSearchOperations::withEndpoint(new FakeSearx('never'))->operations()[0];
 
         self::assertSame(['query' => '', 'results' => []], ($op->handler)(['query' => '']));
     }
@@ -129,7 +129,7 @@ final class WebSearchOperationsTest extends TestCase
             ['title' => 'Milpa', 'url' => 'https://milpa.lat/', 'content' => 'A modular ecosystem'],
             ['title' => 'Packagist', 'url' => 'https://packagist.org/', 'content' => ''],
         ]]);
-        $op = (new WebSearchOperations(new FakeSearx($json)))->operations()[0];
+        $op = WebSearchOperations::withEndpoint(new FakeSearx($json))->operations()[0];
         $out = ($op->handler)(['query' => 'milpa', 'limit' => 1]);
 
         self::assertSame('milpa', $out['query']);
@@ -145,14 +145,14 @@ final class WebSearchOperationsTest extends TestCase
             static fn (int $i): array => ['title' => "r{$i}", 'url' => '', 'content' => ''],
             range(1, 9),
         );
-        $op = (new WebSearchOperations(new FakeSearx((string) json_encode(['results' => $results]))))->operations()[0];
+        $op = WebSearchOperations::withEndpoint(new FakeSearx((string) json_encode(['results' => $results])))->operations()[0];
 
         self::assertCount(5, ($op->handler)(['query' => 'milpa'])['results']);
     }
 
     public function testAnUnreachableSearxngThrows(): void
     {
-        $op = (new WebSearchOperations(new FakeSearx(false)))->operations()[0];
+        $op = WebSearchOperations::withEndpoint(new FakeSearx(false))->operations()[0];
 
         $this->expectException(\RuntimeException::class);
         ($op->handler)(['query' => 'milpa']);
@@ -172,6 +172,19 @@ final class WebSearchOperationsTest extends TestCase
     public function testTheOperationIsDeclaredNotHandWritten(): void
     {
         self::assertTrue(DeclaredOperation::isDeclared(Search::class));
+    }
+
+    /**
+     * The host builds this provider, and the way it builds it is not negotiable.
+     *
+     * `app-runtime` passes the app container to any declared provider whose constructor takes a
+     * parameter. A provider that puts a collaborator there type-errors in every real app while
+     * every unit test passes — which is exactly what happened on cattle before this test existed.
+     */
+    public function testTheProviderTakesNoConstructorArgumentBecauseThatSlotIsTheHosts(): void
+    {
+        self::assertSame(0, (new \ReflectionClass(WebSearchOperations::class))->getConstructor()?->getNumberOfParameters() ?? 0);
+        self::assertCount(1, (new WebSearchOperations())->operations());
     }
 }
 
