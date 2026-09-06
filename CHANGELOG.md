@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/getmilpa/web-search/compare/v0.2.0...v0.2.1) (2026-09-06)
+
+
+### Bug Fixes
+
+* the provider takes no constructor argument, because that slot is the host's ([#4](https://github.com/getmilpa/web-search/issues/4)) ([ded49d6](https://github.com/getmilpa/web-search/commit/ded49d620e7b1c263332fdfd604640d3958e906b))
+
 ## [0.2.0](https://github.com/getmilpa/web-search/compare/v0.1.0...v0.2.0) (2026-09-06)
 
 
