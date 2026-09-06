@@ -52,6 +52,34 @@ web:search  { "query": "milpa framework", "limit": 5 }
   → authorized → results from your SearXNG
 ```
 
+## The declaration IS the contract
+
+The operation is a class whose attributes carry the intent and whose constructor carries the input —
+nothing restates a schema PHP already knew (`milpa/command` ≥ 0.23, greenhouse `decisions/0212`):
+
+```php
+#[Operation(
+    name: 'web:search',
+    description: 'Search the web via SearXNG. Read-only locally, but the query leaves the machine.',
+    surfaces: ['cli', 'tui', 'mcp', 'http'],
+)]
+#[Reads(externality: Externality::ThirdParty, authority: Authority::Read)]
+final readonly class Search
+{
+    public function __construct(
+        #[Because('the search query')] public string $query,
+        #[Because('max results')] public int $limit = 5,
+    ) {
+    }
+
+    public function run(Searx $searx): array { /* … */ }
+}
+```
+
+`#[Reads]` takes an externality rather than assuming one, and this operation is why: a read is not
+automatically harmless. Changing nothing locally while handing a query to a third party is exactly
+the case the gate exists for, and it is the declaration — not the location — that makes it pause.
+
 ## License
 
 Apache-2.0 · © Rodrigo Vicente — TeamX Agency
