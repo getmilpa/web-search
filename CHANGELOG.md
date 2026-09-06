@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/getmilpa/web-search/compare/v0.1.0...v0.2.0) (2026-09-06)
+
+
+### Features
+
+* declare web:search instead of hand-writing its contract ([#2](https://github.com/getmilpa/web-search/issues/2)) ([7f1e7f0](https://github.com/getmilpa/web-search/commit/7f1e7f07f9211bc202b100dabfe5dd5d9966c4e6))
+
 ## 0.1.0 (2026-08-30)
 
 
