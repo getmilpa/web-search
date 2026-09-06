@@ -10,7 +10,7 @@
     ],
     "require": {
         "php": ">=8.3",
-        "milpa/command": ">=0.5 <1.0"
+        "milpa/command": "^0.23"
     },
     "autoload": {
         "psr-4": {
