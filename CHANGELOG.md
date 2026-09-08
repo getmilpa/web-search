@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0](https://github.com/getmilpa/web-search/compare/v0.2.1...v0.3.0) (2026-09-08)
+
+
+### Features
+
+* declare the capability type, because a contract nobody enumerates is never fetched ([#8](https://github.com/getmilpa/web-search/issues/8)) ([f218368](https://github.com/getmilpa/web-search/commit/f21836877505913228f8f97a55b01c4f217a1304))
+
+
+### Bug Fixes
+
+* admit every minor of milpa/command, not just 0.23 ([#6](https://github.com/getmilpa/web-search/issues/6)) ([67c444f](https://github.com/getmilpa/web-search/commit/67c444fb47637e369401e5e8fe9a907b4799657e))
+
 ## [0.2.1](https://github.com/getmilpa/web-search/compare/v0.2.0...v0.2.1) (2026-09-06)
 
 
