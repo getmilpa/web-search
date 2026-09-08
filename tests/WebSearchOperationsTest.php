@@ -47,8 +47,8 @@ final class WebSearchOperationsTest extends TestCase
      * The migration to the declared form changed the DECLARATION, not the CONTRACT.
      *
      * This compares the derived operation against the `new Operation(...)` this package shipped
-     * through v0.4.x, field by field. TWO differences survive on purpose, and both classify MORE
-     * than the hand-written form did:
+     * through v0.4.x, field by field. THREE differences survive on purpose, and all three classify
+     * MORE than the hand-written form did:
      *
      *   - the schema carries `default: 5`, which the prose used to hide inside a description;
      *   - the subject is `None` instead of `Unknown`. An operation that changes nothing HAS no
@@ -57,6 +57,14 @@ final class WebSearchOperationsTest extends TestCase
      *     {@see EffectProfile::readOnly()} answers it, which is where the canonical read lives.
      *     What governs this operation is untouched: `Externality::ThirdParty` is what makes the
      *     session gate pause, and it is declared exactly as before.
+     *   - reversibility is `NotApplicable` with no rollback contract, where what shipped said
+     *     `Guaranteed` backed by the prose «nothing-to-roll-back». That pair is no longer a choice:
+     *     since `milpa/command` v0.25 `EffectProfile` REFUSES to construct `Mutation::None` with
+     *     `Reversibility::Guaranteed`, so the historical form above cannot be rebuilt as it shipped
+     *     and this test records it instead. The invariant was measured, and this operation was one
+     *     of the specimens: twenty of twenty-three `Guaranteed` operations on a founded app changed
+     *     nothing and backed the claim with that same prose, which made an audit of who promises
+     *     reversibility 87% noise. Nothing to undo is not a promise to undo.
      */
     public function testTheDeclaredFormProjectsWhatTheHandWrittenOneProjected(): void
     {
@@ -78,9 +86,8 @@ final class WebSearchOperationsTest extends TestCase
             effects: new EffectProfile(
                 Mutation::None,
                 Externality::ThirdParty,
-                Reversibility::Guaranteed,
+                Reversibility::NotApplicable,
                 Authority::Read,
-                rollbackContract: 'nothing-to-roll-back',
             ),
             surfaces: ['cli', 'tui', 'mcp', 'http'],
         );
@@ -98,6 +105,14 @@ final class WebSearchOperationsTest extends TestCase
         self::assertSame($shipped->effectCeiling()->reversibility, $op->effectCeiling()->reversibility);
         self::assertSame($shipped->effectCeiling()->authority, $op->effectCeiling()->authority);
         self::assertSame($shipped->effectCeiling()->rollbackContract, $op->effectCeiling()->rollbackContract);
+
+        // The pair this package shipped is not merely unused now — it cannot be built.
+        try {
+            new EffectProfile(Mutation::None, Externality::ThirdParty, Reversibility::Guaranteed, Authority::Read, rollbackContract: 'nothing-to-roll-back');
+            self::fail('`Mutation::None` with «guaranteed» must be refused by construction');
+        } catch (\InvalidArgumentException $e) {
+            self::assertStringContainsString('cannot promise to undo it', $e->getMessage());
+        }
 
         self::assertSame(Subject::Unknown, $shipped->effectCeiling()->subject, 'what shipped never said');
         self::assertSame(Subject::None, $op->effectCeiling()->subject, 'what is declared now says it');
