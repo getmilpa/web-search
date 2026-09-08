@@ -1,6 +1,7 @@
 {
     "name": "milpa/web-search",
     "description": "A governed web:search capability for Milpa apps — read-only locally, but the query leaves the machine (Externality::ThirdParty), so the egress gate governs it.",
+    "type": "milpa-capability",
     "license": "Apache-2.0",
     "authors": [
         {
